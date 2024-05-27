@@ -1,0 +1,24 @@
+[
+    {
+        "ip": "192.168.1.1",
+        "measure": "temp_block",
+        "start_time": "2024-05-27T20:57:13.223546",
+        "end_time": "2024-05-27T21:57:13.223546",
+        "reason": "Suspicious activity"
+    },
+    {
+        "ip": "192.168.1.2",
+        "measure": "perma_block",
+        "start_time": "2024-05-27T20:57:13.224546",
+        "end_time": null,
+        "reason": "Repeated attacks"
+    },
+    {
+        "ip": "192.168.1.3",
+        "measure": "traffic_slowdown",
+        "start_time": "2024-05-27T20:57:13.225546",
+        "end_time": null,
+        "max_mb_per_sec": 1,
+        "reason": "Bandwidth abuse"
+    }
+]
