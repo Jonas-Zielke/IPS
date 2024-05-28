@@ -1,8 +1,9 @@
 import json
-from datetime import datetime, timedelta
 import os
+import subprocess
+from datetime import datetime, timedelta
 import sys
-
+import platform
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -38,6 +39,34 @@ def update_active_measures(measure):
 def is_ip_excluded(ip):
     return any(ip.startswith(prefix) for prefix in EXCLUDED_IP_RANGES)
 
+def add_iptables_rule(ip):
+    try:
+        subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'], check=True)
+        print(f"IP {ip} blocked.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error blocking IP {ip}: {e}")
+
+def remove_iptables_rule(ip):
+    try:
+        subprocess.run(['sudo', 'iptables', '-D', 'INPUT', '-s', ip, '-j', 'DROP'], check=True)
+        print(f"IP {ip} unblocked.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error unblocking IP {ip}: {e}")
+
+def add_windows_firewall_rule(ip):
+    try:
+        subprocess.run(['netsh', 'advfirewall', 'firewall', 'add', 'rule', f'name=Block {ip}', 'dir=in', 'action=block', f'remoteip={ip}'], check=True)
+        print(f"IP {ip} blocked.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error blocking IP {ip}: {e}")
+
+def remove_windows_firewall_rule(ip):
+    try:
+        subprocess.run(['netsh', 'advfirewall', 'firewall', 'delete', 'rule', f'name=Block {ip}'], check=True)
+        print(f"IP {ip} unblocked.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error unblocking IP {ip}: {e}")
+
 def temp_block(ip, duration_minutes, reason=None):
     if is_ip_excluded(ip):
         return
@@ -49,6 +78,10 @@ def temp_block(ip, duration_minutes, reason=None):
         "end_time": end_time.isoformat(),
         "reason": reason
     }
+    if platform.system() == "Linux":
+        add_iptables_rule(ip)
+    elif platform.system() == "Windows":
+        add_windows_firewall_rule(ip)
     log_measure(measure)
     update_active_measures(measure)
     print(f"Temporary block set for IP {ip} for {duration_minutes} minutes.")
@@ -63,6 +96,10 @@ def perma_block(ip, reason=None):
         "end_time": None,
         "reason": reason
     }
+    if platform.system() == "Linux":
+        add_iptables_rule(ip)
+    elif platform.system() == "Windows":
+        add_windows_firewall_rule(ip)
     log_measure(measure)
     update_active_measures(measure)
     print(f"Permanent block set for IP {ip}.")
@@ -70,6 +107,7 @@ def perma_block(ip, reason=None):
 def traffic_slowdown(ip, max_mb_per_sec, reason=None):
     if is_ip_excluded(ip):
         return
+
     measure = {
         "ip": ip,
         "measure": "traffic_slowdown",

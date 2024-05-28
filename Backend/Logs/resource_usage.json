@@ -1,0 +1,5 @@
+{"timestamp": "2024-05-28T13:18:16.974757", "cpu_usage": 1.6, "ram_usage": 35.8, "network_traffic": {"bytes_sent": 13024261, "bytes_received": 77797014}}
+{"timestamp": "2024-05-28T13:19:36.585093", "cpu_usage": 4.7, "ram_usage": 36.0, "network_traffic": {"bytes_sent": 13429208, "bytes_received": 80842827}}
+{"timestamp": "2024-05-28T13:20:38.798644", "cpu_usage": 0.5, "ram_usage": 36.1, "network_traffic": {"bytes_sent": 13661328, "bytes_received": 84653676}}
+{"timestamp": "2024-05-28T13:21:07.703890", "cpu_usage": 5.5, "ram_usage": 36.2, "network_traffic": {"bytes_sent": 13755987, "bytes_received": 84772774}}
+{"timestamp": "2024-05-28T13:21:49.202172", "cpu_usage": 1.4, "ram_usage": 36.2, "network_traffic": {"bytes_sent": 13892345, "bytes_received": 84905975}}
