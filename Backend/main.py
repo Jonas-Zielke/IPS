@@ -1,3 +1,4 @@
+# main.py
 import json
 import time
 import threading
@@ -6,15 +7,42 @@ from datetime import datetime
 from Config import FORWARDING_RULES, EXCLUDED_IP_RANGES, SYN_FLOOD_PROTECTION_ENABLED
 from Module import Rules, Block
 from Module.ResourceManager import ResourceManager
+import uvicorn
+from Module.API.API import app
+from Module.Manage_Connections import connection_manager
+from pathlib import Path
 
-logfile = 'Logs/network_traffic_logs.json'
-resource_logfile = 'Logs/resource_usage.json'
+BASE_DIR = Path(__file__).resolve().parent
+logfile = BASE_DIR / 'Logs/network_traffic_logs.json'
+resource_logfile = BASE_DIR / 'Logs/resource_usage.json'
+connections_logfile = BASE_DIR / 'Logs/active_connections.json'
 rules = []
 
+def initialize_json_files():
+    files = [logfile, resource_logfile, connections_logfile]
+    for file in files:
+        if not file.exists():
+            with open(file, 'w') as f:
+                json.dump([], f)
+                print(f"Initialized {file}")  # Debugging-Ausgabe
+
+initialize_json_files()
+
 def log_to_json(data, file):
-    with open(file, 'a') as f:
-        json.dump(data, f)
-        f.write('\n')
+    print(f"Writing data to {file}: {data}")  # Debugging-Ausgabe
+    if not file.exists():
+        with open(file, 'w') as f:
+            json.dump([data], f)
+    else:
+        with open(file, 'r+') as f:
+            try:
+                logs = json.load(f)
+            except json.JSONDecodeError:
+                logs = []
+            logs.append(data)
+            f.seek(0)
+            json.dump(logs, f, indent=4)
+    print(f"Successfully wrote data to {file}")  # Debugging-Ausgabe
 
 def register_rule(rule_func):
     global rules
@@ -64,7 +92,6 @@ def packet_callback(packet):
             rule(log_entry)
 
 def log_resource_usage():
-    print("Logging...")
     resource_usage = {
         "timestamp": datetime.now().isoformat(),
         "cpu_usage": ResourceManager.get_cpu_usage(),
@@ -72,6 +99,22 @@ def log_resource_usage():
         "network_traffic": ResourceManager.get_network_traffic()
     }
     log_to_json(resource_usage, resource_logfile)
+
+def log_connections():
+    active_connections = connection_manager.connections
+    connections_list = [
+        {
+            "src_ip": conn[0],
+            "src_port": conn[1],
+            "dst_ip": conn[2],
+            "dst_port": conn[3],
+            "timestamp": datetime.fromtimestamp(timestamp).isoformat()
+        }
+        for conn, timestamp in active_connections.items()
+    ]
+    with open(connections_logfile, 'w') as f:
+        json.dump(connections_list, f, indent=4)
+    print(f"Logged connections to {connections_logfile}")  # Debugging-Ausgabe
 
 register_rule(Rules.log_http_traffic)
 register_rule(Rules.log_https_traffic)
@@ -85,13 +128,19 @@ if SYN_FLOOD_PROTECTION_ENABLED:
 #Block.perma_block("192.168.1.2", "Repeated attacks")
 #Block.traffic_slowdown("192.168.1.3", 1, "Bandwidth abuse")
 
-# Protokollieren der Ressourcennutzung alle 10 Sekunden
+# Protokollieren der Ressourcennutzung und Verbindungen alle 10 Sekunden
 def start_resource_logging():
     while True:
         log_resource_usage()
+        log_connections()
         time.sleep(10)
 
+def start_api():
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
 resource_logging_thread = threading.Thread(target=start_resource_logging, daemon=True)
+resource_api_thread = threading.Thread(target=start_api, daemon=True)
+resource_api_thread.start()
 resource_logging_thread.start()
 
 sniff(prn=packet_callback, store=0)
