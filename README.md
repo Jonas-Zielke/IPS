@@ -33,7 +33,7 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 
 1. Klonen Sie das Repository:
     ```bash
-    git clone https://github.com/yourusername/ips-system.git
+    git clone https://github.com/Jonas-Zielke/IPS.git
     cd ips-system/Backend
     ```
 
@@ -41,7 +41,7 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
     ```bash
     python -m venv ve
     ve/Scripts/activate
-    pip install -r requirements.txt
+    pip install -r install.txt
     ```
 
 3. Starten Sie das Backend:
