@@ -89,7 +89,7 @@ def packet_callback(packet):
     if log_entry["proto"] in ["TCP", "UDP"]:
         log_to_json(log_entry, logfile)
         for rule in rules:
-            rule(log_entry)
+            rule(packet, log_entry)
 
 def log_resource_usage():
     resource_usage = {
@@ -119,6 +119,16 @@ def log_connections():
 register_rule(Rules.log_http_traffic)
 register_rule(Rules.log_https_traffic)
 register_rule(Rules.forward_traffic)
+register_rule(Rules.detect_denamysch_ip)
+register_rule(Rules.detect_port_scan)
+register_rule(Rules.detect_sql_injection)
+register_rule(Rules.detect_xss)
+register_rule(Rules.detect_directory_traversal)
+register_rule(Rules.detect_bruteforce)
+register_rule(Rules.detect_dns_amplification)
+register_rule(Rules.detect_ntp_amplification)
+register_rule(Rules.detect_suspicious_user_agent)
+register_rule(Rules.detect_large_payload)
 
 if SYN_FLOOD_PROTECTION_ENABLED:
     register_rule(Rules.monitor_tcp_connections)
