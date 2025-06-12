@@ -1,20 +1,26 @@
-import json
-from scapy.all import sniff, IP, TCP, UDP, send, IP, TCP, UDP
-from datetime import datetime
+"""Packet processing rules used by the IPS."""
+
+from scapy.all import IP, TCP, UDP, send
 from Config import FORWARDING_RULES
 
 
-def log_http_traffic(packet):
+def log_http_traffic(packet) -> None:
+    """Print a message when HTTP traffic is detected."""
+
     if packet["http"]:
         print(f"HTTP traffic detected: {packet}")
 
 
-def log_https_traffic(packet):
+def log_https_traffic(packet) -> None:
+    """Print a message when HTTPS traffic is detected."""
+
     if packet["https"]:
         print(f"HTTPS traffic detected: {packet}")
 
 
-def forward_traffic(packet):
+def forward_traffic(packet) -> None:
+    """Forward HTTP/HTTPS traffic to a configured port."""
+
     if packet["http"]:
         new_port = FORWARDING_RULES.get("http")
     elif packet["https"]:

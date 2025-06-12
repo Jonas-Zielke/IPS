@@ -1,26 +1,45 @@
-# main.py
+"""Entry point for the simple Intrusion Prevention System (IPS).
+
+This script captures network traffic using ``scapy`` and applies a series of
+rules to each packet. Detected packets are logged to ``Logs/network_traffic_logs.json``
+and can trigger measures such as forwarding or blocking.
+"""
+
 import json
-from scapy.all import sniff, IP, TCP, UDP
 from datetime import datetime
+
+from scapy.all import sniff, IP, TCP, UDP
+
 from Config import FORWARDING_RULES, EXCLUDED_IP_RANGES
 from Module import Rules, Block
 
-logfile = 'Logs/network_traffic_logs.json'
-rules = []
+# Path to the JSON log that stores all captured traffic.
+logfile = "Logs/network_traffic_logs.json"
 
-def log_to_json(data):
-    with open(logfile, 'a') as f:
+# All registered callback functions that will be executed for every packet.
+rules: list = []
+
+def log_to_json(data: dict) -> None:
+    """Append a log entry to the traffic log file."""
+
+    with open(logfile, "a") as f:
         json.dump(data, f)
-        f.write('\n')
+        f.write("\n")
 
-def register_rule(rule_func):
+def register_rule(rule_func) -> None:
+    """Register a function to be executed for each captured packet."""
+
     global rules
     rules.append(rule_func)
 
-def is_ip_excluded(ip):
+def is_ip_excluded(ip: str) -> bool:
+    """Return ``True`` if the IP matches one of the excluded ranges."""
+
     return any(ip.startswith(prefix) for prefix in EXCLUDED_IP_RANGES)
 
-def packet_callback(packet):
+def packet_callback(packet) -> None:
+    """Handle captured packets and apply registered rules."""
+
     log_entry = {
         "timestamp": datetime.now().isoformat(),
         "ip_src": None,
