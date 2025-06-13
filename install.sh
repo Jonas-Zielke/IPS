@@ -44,7 +44,7 @@ if [[ "$choice" == "a" || "$choice" == "b" ]]; then
     read apply_settings
 
     if [[ "$apply_settings" == "yes" ]]; then
-        cat <<EOL > Backend/config.py
+        cat <<EOL > Backend/Config.py
 FORWARDING_RULES = {
 
 }
@@ -57,7 +57,7 @@ SYN_FLOOD_PROTECTION_ENABLED = True
 SYN_FLOOD_TIMEOUT = 2
 EOL
     else
-        cat <<EOL > Backend/config.py
+        cat <<EOL > Backend/Config.py
 FORWARDING_RULES = {
 
 }
