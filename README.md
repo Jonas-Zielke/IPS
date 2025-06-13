@@ -33,8 +33,8 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 
 1. Klonen Sie das Repository:
     ```bash
-    git clone https://github.com/Jonas-Zielke/IPS.git
-    cd ips-system/Backend
+   git clone https://github.com/Jonas-Zielke/IPS.git
+   cd IPS/Backend
     ```
 
 2. Erstellen Sie eine virtuelle Umgebung und installieren Sie die Abhängigkeiten:
@@ -53,7 +53,7 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 
 1. Navigieren Sie zum Frontend-Verzeichnis:
     ```bash
-    cd ../Frontend
+    cd ../dashboard
     ```
 
 2. Installieren Sie die Abhängigkeiten:
@@ -97,4 +97,4 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 
 ## Lizenz
 
-Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE.md](LICENSE.md)-Datei für Details.
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE)-Datei für Details.
