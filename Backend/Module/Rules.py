@@ -10,7 +10,10 @@ from Config import (
     BRUTE_FORCE_THRESHOLD,
     BRUTE_FORCE_WINDOW,
 )
-from Module.Manage_Connections import connection_manager
+from Module.Manage_Connections import get_connection_manager
+
+# Lazily initialize the connection manager when the rules module is imported
+connection_manager = get_connection_manager()
 from Module import Block
 
 

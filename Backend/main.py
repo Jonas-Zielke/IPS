@@ -9,7 +9,7 @@ from Module import Rules, Block
 from Module.ResourceManager import ResourceManager
 import uvicorn
 from Module.API.API import app
-from Module.Manage_Connections import connection_manager
+from Module.Manage_Connections import get_connection_manager
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,6 +17,9 @@ logfile = BASE_DIR / 'Logs/network_traffic_logs.json'
 resource_logfile = BASE_DIR / 'Logs/resource_usage.json'
 connections_logfile = BASE_DIR / 'Logs/active_connections.json'
 rules = []
+
+# Initialize connection manager lazily so threads only start when needed
+connection_manager = get_connection_manager()
 
 def initialize_json_files():
     files = [logfile, resource_logfile, connections_logfile]
