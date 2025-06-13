@@ -89,9 +89,14 @@ def add_tc_rule(ip, max_mb_per_sec, interface="eth0"):
             'protocol', 'ip', 'u32', 'match', 'ip', 'dst', ip, 'police',
             'rate', rate, 'burst', '10k', 'drop', 'flowid', ':1'
         ], check=True)
-        print(f"Traffic shaping applied for {ip} on {interface} at {rate}.")
+        logger.info(
+            "Traffic shaping applied for %s on %s at %s.",
+            ip,
+            interface,
+            rate,
+        )
     except subprocess.CalledProcessError as e:
-        print(f"Error applying tc rule for {ip}: {e}")
+        logger.error("Error applying tc rule for %s: %s", ip, e)
 
 def remove_tc_rule(ip, interface="eth0"):
     """Remove traffic shaping rules for an IP."""
@@ -106,9 +111,9 @@ def remove_tc_rule(ip, interface="eth0"):
             'protocol', 'ip', 'u32', 'match', 'ip', 'dst', ip,
             'flowid', ':1'
         ], check=False)
-        print(f"Traffic shaping removed for {ip} on {interface}.")
+        logger.info("Traffic shaping removed for %s on %s.", ip, interface)
     except subprocess.CalledProcessError as e:
-        print(f"Error removing tc rule for {ip}: {e}")
+        logger.error("Error removing tc rule for %s: %s", ip, e)
 
 def temp_block(ip, duration_minutes, reason=None):
     if is_ip_excluded(ip):
