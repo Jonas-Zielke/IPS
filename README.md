@@ -40,13 +40,16 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 2. Erstellen Sie eine virtuelle Umgebung und installieren Sie die Abhängigkeiten:
     ```bash
     python -m venv ve
-    ve/Scripts/activate
+    # Unix-basierte Systeme
+    source ve/bin/activate
+    # Windows
+    .\ve\Scripts\activate
     pip install -r install.txt
     ```
 
-3. Starten Sie das Backend:
+3. Starten Sie das Backend (nach Aktivierung der virtuellen Umgebung):
     ```bash
-    ve/Scripts/python.exe main.py
+    python main.py
     ```
 
 ### Frontend
