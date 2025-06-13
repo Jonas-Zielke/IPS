@@ -24,3 +24,6 @@ SYN_FLOOD_PROTECTION_ENABLED = True
 SYN_FLOOD_TIMEOUT = 2
 
 TC_INTERFACE = "eth0"
+
+# Maximum number of log records to keep when truncating log files
+MAX_LOG_RECORDS = 1000

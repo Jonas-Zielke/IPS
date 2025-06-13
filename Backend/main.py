@@ -52,6 +52,10 @@ def log_to_json(data, file):
             except json.JSONDecodeError:
                 logs = []
             logs.append(data)
+            # Truncate the list when it exceeds the configured size
+            from Config import MAX_LOG_RECORDS
+            if len(logs) > MAX_LOG_RECORDS:
+                logs = logs[-MAX_LOG_RECORDS:]
             f.seek(0)
             json.dump(logs, f, indent=4)
     logger.debug("Successfully wrote data to %s", file)

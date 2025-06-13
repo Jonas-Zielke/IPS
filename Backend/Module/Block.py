@@ -33,6 +33,9 @@ def read_from_json(file):
 def log_measure(measure):
     logs = read_from_json(block_log_file)
     logs.append(measure)
+    from Config import MAX_LOG_RECORDS
+    if len(logs) > MAX_LOG_RECORDS:
+        logs = logs[-MAX_LOG_RECORDS:]
     write_to_json(block_log_file, logs)
 
 def update_active_measures(measure):

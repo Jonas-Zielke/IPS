@@ -88,6 +88,14 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 - **GET** `/logs/network`: Abrufen der protokollierten Netzwerkdaten.
 - **GET** `/logs/resource`: Abrufen der protokollierten Ressourcennutzungsdaten.
 
+## Log-Verwaltung
+
+Um ein unbegrenztes Wachstum der Logdateien zu verhindern, werden diese
+automatisch gekürzt. Sobald eine Logdatei mehr als `MAX_LOG_RECORDS`
+Einträge enthält (standardmäßig 1000), bleiben nur die neuesten Datensätze
+erhalten. Die Konstante `MAX_LOG_RECORDS` kann in `Backend/Config.py`
+angepasst werden.
+
 ## Fehlerbehebung
 
 ### Bekannte Probleme
