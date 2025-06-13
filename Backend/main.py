@@ -2,6 +2,8 @@
 import json
 import time
 import threading
+import os
+import logging
 from scapy.all import sniff, IP, TCP, UDP
 from datetime import datetime
 from Config import FORWARDING_RULES, EXCLUDED_IP_RANGES, SYN_FLOOD_PROTECTION_ENABLED
@@ -11,6 +13,13 @@ import uvicorn
 from Module.API.API import app
 from Module.Manage_Connections import get_connection_manager
 from pathlib import Path
+
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL, logging.INFO),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
 logfile = BASE_DIR / 'Logs/network_traffic_logs.json'
@@ -27,12 +36,12 @@ def initialize_json_files():
         if not file.exists():
             with open(file, 'w') as f:
                 json.dump([], f)
-                print(f"Initialized {file}")  # Debugging-Ausgabe
+                logger.debug("Initialized %s", file)
 
 initialize_json_files()
 
 def log_to_json(data, file):
-    print(f"Writing data to {file}: {data}")  # Debugging-Ausgabe
+    logger.debug("Writing data to %s: %s", file, data)
     if not file.exists():
         with open(file, 'w') as f:
             json.dump([data], f)
@@ -45,7 +54,7 @@ def log_to_json(data, file):
             logs.append(data)
             f.seek(0)
             json.dump(logs, f, indent=4)
-    print(f"Successfully wrote data to {file}")  # Debugging-Ausgabe
+    logger.debug("Successfully wrote data to %s", file)
 
 def register_rule(rule_func):
     global rules
@@ -117,7 +126,7 @@ def log_connections():
     ]
     with open(connections_logfile, 'w') as f:
         json.dump(connections_list, f, indent=4)
-    print(f"Logged connections to {connections_logfile}")  # Debugging-Ausgabe
+    logger.debug("Logged connections to %s", connections_logfile)
 
 register_rule(Rules.log_http_traffic)
 register_rule(Rules.log_https_traffic)

@@ -3,9 +3,11 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 import json
 from pathlib import Path
+import logging
 from Module.ResourceManager import *
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
 
 # Pfade zu den Logdateien
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -16,20 +18,20 @@ RESOURCE_USAGE_LOG_FILE = BASE_DIR / 'Logs/resource_usage.json'
 ACTIVE_CONNECTIONS_FILE = BASE_DIR / 'Logs/active_connections.json'
 
 def read_json_file(file_path: Path):
-    print(f"Reading data from {file_path}")  # Debugging-Ausgabe
+    logger.debug("Reading data from %s", file_path)
     if file_path.exists():
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
-                print(f"Data read from {file_path}: {data}")  # Debugging-Ausgabe
+                logger.debug("Data read from %s: %s", file_path, data)
                 return data
         except json.JSONDecodeError as e:
-            print(f"JSONDecodeError encountered while reading {file_path}: {e}")  # Debugging-Ausgabe
+            logger.error("JSONDecodeError encountered while reading %s: %s", file_path, e)
             # Versuchen Sie, die beschädigte Datei zu reparieren
             with open(file_path, 'w') as f:
                 json.dump([], f)
             return []
-    print(f"File {file_path} does not exist")  # Debugging-Ausgabe
+    logger.debug("File %s does not exist", file_path)
     return []
 
 @app.get("/logs/blocks")

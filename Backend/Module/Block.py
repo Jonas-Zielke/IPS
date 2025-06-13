@@ -4,8 +4,10 @@ import subprocess
 from datetime import datetime, timedelta
 import sys
 import platform
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+logger = logging.getLogger(__name__)
 
 from Config import EXCLUDED_IP_RANGES
 
@@ -43,30 +45,30 @@ def is_ip_excluded(ip):
 def add_iptables_rule(ip):
     try:
         subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'], check=True)
-        print(f"IP {ip} blocked.")
+        logger.info("IP %s blocked.", ip)
     except subprocess.CalledProcessError as e:
-        print(f"Error blocking IP {ip}: {e}")
+        logger.error("Error blocking IP %s: %s", ip, e)
 
 def remove_iptables_rule(ip):
     try:
         subprocess.run(['sudo', 'iptables', '-D', 'INPUT', '-s', ip, '-j', 'DROP'], check=True)
-        print(f"IP {ip} unblocked.")
+        logger.info("IP %s unblocked.", ip)
     except subprocess.CalledProcessError as e:
-        print(f"Error unblocking IP {ip}: {e}")
+        logger.error("Error unblocking IP %s: %s", ip, e)
 
 def add_windows_firewall_rule(ip):
     try:
         subprocess.run(['netsh', 'advfirewall', 'firewall', 'add', 'rule', f'name=Block {ip}', 'dir=in', 'action=block', f'remoteip={ip}'], check=True)
-        print(f"IP {ip} blocked.")
+        logger.info("IP %s blocked.", ip)
     except subprocess.CalledProcessError as e:
-        print(f"Error blocking IP {ip}: {e}")
+        logger.error("Error blocking IP %s: %s", ip, e)
 
 def remove_windows_firewall_rule(ip):
     try:
         subprocess.run(['netsh', 'advfirewall', 'firewall', 'delete', 'rule', f'name=Block {ip}'], check=True)
-        print(f"IP {ip} unblocked.")
+        logger.info("IP %s unblocked.", ip)
     except subprocess.CalledProcessError as e:
-        print(f"Error unblocking IP {ip}: {e}")
+        logger.error("Error unblocking IP %s: %s", ip, e)
 
 def temp_block(ip, duration_minutes, reason=None):
     if is_ip_excluded(ip):
@@ -85,7 +87,7 @@ def temp_block(ip, duration_minutes, reason=None):
         add_windows_firewall_rule(ip)
     log_measure(measure)
     update_active_measures(measure)
-    print(f"Temporary block set for IP {ip} for {duration_minutes} minutes.")
+    logger.info("Temporary block set for IP %s for %s minutes.", ip, duration_minutes)
 
 def perma_block(ip, reason=None):
     if is_ip_excluded(ip):
@@ -103,7 +105,7 @@ def perma_block(ip, reason=None):
         add_windows_firewall_rule(ip)
     log_measure(measure)
     update_active_measures(measure)
-    print(f"Permanent block set for IP {ip}.")
+    logger.info("Permanent block set for IP %s.", ip)
 
 def traffic_slowdown(ip, max_mb_per_sec, reason=None):
     if is_ip_excluded(ip):
@@ -119,6 +121,8 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
     }
     log_measure(measure)
     update_active_measures(measure)
-    print(f"Traffic slowdown set for IP {ip} with limit {max_mb_per_sec} MB/s.")
+    logger.info(
+        "Traffic slowdown set for IP %s with limit %s MB/s.", ip, max_mb_per_sec
+    )
 
 initialize_json_files()
