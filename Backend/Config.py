@@ -22,3 +22,9 @@ BRUTE_FORCE_WINDOW = 60   # seconds
 
 SYN_FLOOD_PROTECTION_ENABLED = True
 SYN_FLOOD_TIMEOUT = 2
+
+# Log rotation configuration
+# Maximum number of records to keep per log file
+LOG_MAX_RECORDS = 1000
+# Remove log entries older than this many days (None disables age based cleanup)
+LOG_MAX_AGE_DAYS = 30

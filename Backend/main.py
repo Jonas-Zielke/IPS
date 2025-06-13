@@ -12,6 +12,7 @@ from Module.ResourceManager import ResourceManager
 import uvicorn
 from Module.API.API import app
 from Module.Manage_Connections import get_connection_manager
+from Module.LogUtils import prune_log_file
 from pathlib import Path
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -54,6 +55,7 @@ def log_to_json(data, file):
             logs.append(data)
             f.seek(0)
             json.dump(logs, f, indent=4)
+    prune_log_file(file)
     logger.debug("Successfully wrote data to %s", file)
 
 def register_rule(rule_func):
@@ -126,6 +128,7 @@ def log_connections():
     ]
     with open(connections_logfile, 'w') as f:
         json.dump(connections_list, f, indent=4)
+    prune_log_file(connections_logfile)
     logger.debug("Logged connections to %s", connections_logfile)
 
 register_rule(Rules.log_http_traffic)

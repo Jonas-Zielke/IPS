@@ -1,6 +1,7 @@
 import time
 import json
 import logging
+from Module.LogUtils import prune_log_file
 from scapy.all import send, IP, TCP
 from threading import Thread, Lock
 from datetime import datetime
@@ -33,6 +34,7 @@ class ConnectionManager:
             ]
             with open(self.active_connections_file, 'w') as f:
                 json.dump(connections_list, f, indent=4)
+            prune_log_file(self.active_connections_file)
 
     def add_connection(self, src_ip, src_port, dst_ip, dst_port):
         with self.lock:

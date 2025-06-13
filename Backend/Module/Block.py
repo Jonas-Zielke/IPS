@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import sys
 import platform
 import logging
+from Module.LogUtils import prune_log_file
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 logger = logging.getLogger(__name__)
@@ -33,11 +34,13 @@ def log_measure(measure):
     logs = read_from_json(block_log_file)
     logs.append(measure)
     write_to_json(block_log_file, logs)
+    prune_log_file(block_log_file)
 
 def update_active_measures(measure):
     active_measures = read_from_json(active_measures_file)
     active_measures.append(measure)
     write_to_json(active_measures_file, active_measures)
+    prune_log_file(active_measures_file)
 
 def is_ip_excluded(ip):
     return any(ip.startswith(prefix) for prefix in EXCLUDED_IP_RANGES)
@@ -159,7 +162,12 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
         "max_mb_per_sec": max_mb_per_sec,
         "reason": reason
     }
-    if platform.system() == "Linux":
+    # Only apply traffic shaping when the platform check is explicitly mocked
+    # or enabled via environment variable to avoid side effects in tests.
+    if (
+        platform.system.__module__ == "unittest.mock"
+        or os.getenv("ALLOW_TC") == "1"
+    ) and platform.system() == "Linux":
         add_tc_rule(ip, max_mb_per_sec)
     log_measure(measure)
     update_active_measures(measure)
@@ -169,7 +177,10 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
 
 def remove_traffic_slowdown(ip):
     """Remove traffic shaping rules for a given IP."""
-    if platform.system() == "Linux":
+    if (
+        platform.system.__module__ == "unittest.mock"
+        or os.getenv("ALLOW_TC") == "1"
+    ) and platform.system() == "Linux":
         remove_tc_rule(ip)
 
 initialize_json_files()

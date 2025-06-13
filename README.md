@@ -13,6 +13,8 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 - **Netzwerkverkehrsprotokollierung**: Erfasst und speichert detaillierte Informationen über den Netzwerkverkehr.
 - **Ressourcenüberwachung**: Überwacht CPU- und RAM-Auslastung sowie Netzwerktraffic.
 - **Datenprotokollierung**: Speichert Protokolle in JSON-Dateien zur späteren Analyse.
+- **Log-Rotation**: Logdateien werden automatisch gekürzt, sodass maximal 1000 Einträge erhalten bleiben (ältere Daten 
+  werden nach 30 Tagen entfernt).
 - **API**: Bietet Endpunkte zum Abrufen aktueller Ressourcennutzungsdaten.
 
 ### Frontend
@@ -68,6 +70,13 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
     ```bash
     npm start
     ```
+
+## Konfiguration
+
+Die wichtigsten Einstellungen befinden sich in `Backend/Config.py`. Hier kann
+unter anderem festgelegt werden, wie viele Datensätze pro Logdatei aufbewahrt
+werden (`LOG_MAX_RECORDS`, standardmäßig 1000) und nach wie vielen Tagen ältere
+Einträge verworfen werden (`LOG_MAX_AGE_DAYS`).
 
 ## Nutzung
 
