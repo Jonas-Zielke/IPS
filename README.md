@@ -26,7 +26,7 @@ Dieses Projekt bietet eine robuste Lösung zur Überwachung und Verwaltung von N
 ### Voraussetzungen
 
 - Python 3.x
-- Node.js und npm
+- Node.js 20 und npm
 - Ein unterstützter Webbrowser
 
 ### Backend
