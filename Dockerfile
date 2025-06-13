@@ -13,7 +13,7 @@ RUN python -m venv ve && \
     pip install --no-cache-dir -r install.txt
 
 # Use an official Node.js runtime as a parent image
-FROM node:14 as frontend
+FROM node:20 as frontend
 
 # Set the working directory in the container
 WORKDIR /app/dashboard
@@ -30,7 +30,7 @@ FROM python:3.9-slim
 # Install Node.js and npm in the final stage
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 # Copy the backend from the previous backend stage
