@@ -1,10 +1,9 @@
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
-
-const userSecrets = {};
+import { getSecret, setSecret } from "../../../utils/secretStore";
 
 export default (req, res) => {
-  const { token, secret, userId } = req.body;
+  const { token, secret, userId } = req.body || {};
 
   if (req.method === "POST") {
     const verified = speakeasy.totp.verify({
@@ -14,15 +13,16 @@ export default (req, res) => {
     });
 
     if (verified && userId) {
-      userSecrets[userId] = secret; // Save the secret after verification
+      setSecret(userId, secret); // Persist the secret after verification
     }
 
     res.status(200).json({ verified });
   } else {
     const userId = req.query.userId;
-    if (userSecrets[userId]) {
+    const existing = getSecret(userId);
+    if (existing) {
       // User already has a secret, don't generate a new one
-      res.status(200).json({ secret: userSecrets[userId], data_url: null });
+      res.status(200).json({ secret: existing, data_url: null });
     } else {
       // Generate a new secret
       const secret = speakeasy.generateSecret({ length: 20 });
