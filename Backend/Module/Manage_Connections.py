@@ -31,6 +31,9 @@ class ConnectionManager:
                 }
                 for conn, timestamp in self.connections.items()
             ]
+            from Config import MAX_LOG_RECORDS
+            if len(connections_list) > MAX_LOG_RECORDS:
+                connections_list = connections_list[-MAX_LOG_RECORDS:]
             with open(self.active_connections_file, 'w') as f:
                 json.dump(connections_list, f, indent=4)
 
