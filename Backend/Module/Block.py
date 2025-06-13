@@ -13,10 +13,11 @@ block_log_file = 'Logs/block_log.json'
 active_measures_file = 'Logs/active_measures.json'
 
 def initialize_json_files():
-    with open(block_log_file, 'w') as f:
-        json.dump([], f)
-    with open(active_measures_file, 'w') as f:
-        json.dump([], f)
+    """Create log files if they don't already exist."""
+    for file in (block_log_file, active_measures_file):
+        if not os.path.exists(file):
+            with open(file, 'w') as f:
+                json.dump([], f)
 
 def write_to_json(file, data):
     with open(file, 'w') as f:
