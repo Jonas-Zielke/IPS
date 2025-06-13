@@ -1,8 +1,11 @@
 import time
 import json
+import logging
 from scapy.all import send, IP, TCP
 from threading import Thread, Lock
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class ConnectionManager:
     def __init__(self, timeout, active_connections_file='Logs/active_connections.json'):
@@ -59,7 +62,13 @@ class ConnectionManager:
     def close_connection(self, src_ip, src_port, dst_ip, dst_port):
         rst_packet = IP(src=src_ip, dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags='R')
         send(rst_packet)
-        print(f"Closed incomplete connection from {src_ip}:{src_port} to {dst_ip}:{dst_port}")
+        logger.info(
+            "Closed incomplete connection from %s:%s to %s:%s",
+            src_ip,
+            src_port,
+            dst_ip,
+            dst_port,
+        )
 
     def start(self):
         Thread(target=self.check_connections, daemon=True).start()

@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+import logging
 from scapy.all import sniff, IP, TCP, UDP, send
 
 from Config import (
@@ -12,6 +13,8 @@ from Config import (
 )
 from Module.Manage_Connections import get_connection_manager
 
+logger = logging.getLogger(__name__)
+
 # Lazily initialize the connection manager when the rules module is imported
 connection_manager = get_connection_manager()
 from Module import Block
@@ -20,12 +23,12 @@ from Module import Block
 def log_http_traffic(pkt, entry):
     """Simple logger for HTTP traffic"""
     if entry.get("http"):
-        print(f"HTTP traffic detected: {entry}")
+        logger.info("HTTP traffic detected: %s", entry)
 
 
 def log_https_traffic(pkt, entry):
     if entry.get("https"):
-        print(f"HTTPS traffic detected: {entry}")
+        logger.info("HTTPS traffic detected: %s", entry)
 
 
 def forward_traffic(pkt, entry):
@@ -45,7 +48,7 @@ def forward_traffic(pkt, entry):
 
         new_packet = ip_layer / transport_layer / entry["payload"]
         send(new_packet)
-        print(f"Forwarded traffic: {entry} to port {new_port}")
+        logger.info("Forwarded traffic: %s to port %s", entry, new_port)
 
 
 def monitor_tcp_connections(pkt, entry):
