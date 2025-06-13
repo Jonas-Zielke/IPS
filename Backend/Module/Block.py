@@ -10,7 +10,7 @@ import inspect
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 logger = logging.getLogger(__name__)
 
-from Config import EXCLUDED_IP_RANGES
+from Config import EXCLUDED_IP_RANGES, TC_INTERFACE
 
 block_log_file = 'Logs/block_log.json'
 active_measures_file = 'Logs/active_measures.json'
@@ -71,7 +71,7 @@ def remove_windows_firewall_rule(ip):
     except subprocess.CalledProcessError as e:
         logger.error("Error unblocking IP %s: %s", ip, e)
 
-def add_tc_rule(ip, max_mb_per_sec, interface="eth0"):
+def add_tc_rule(ip, max_mb_per_sec, interface=TC_INTERFACE):
     """Limit traffic to and from an IP using tc on Linux."""
     rate = f"{max_mb_per_sec}mbit"
     try:
@@ -99,7 +99,7 @@ def add_tc_rule(ip, max_mb_per_sec, interface="eth0"):
     except subprocess.CalledProcessError as e:
         logger.error("Error applying tc rule for %s: %s", ip, e)
 
-def remove_tc_rule(ip, interface="eth0"):
+def remove_tc_rule(ip, interface=TC_INTERFACE):
     """Remove traffic shaping rules for an IP."""
     try:
         subprocess.run([
