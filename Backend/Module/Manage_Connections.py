@@ -66,5 +66,18 @@ class ConnectionManager:
 
 # Initialisiere den ConnectionManager mit einem Timeout aus der Config
 from Config import SYN_FLOOD_TIMEOUT
-connection_manager = ConnectionManager(SYN_FLOOD_TIMEOUT)
-connection_manager.start()
+
+connection_manager = None
+
+
+def get_connection_manager():
+    """Create the global ConnectionManager on first use and start it."""
+    global connection_manager
+    if connection_manager is None:
+        connection_manager = ConnectionManager(SYN_FLOOD_TIMEOUT)
+        connection_manager.start()
+    return connection_manager
+
+
+if __name__ == "__main__":
+    get_connection_manager()
