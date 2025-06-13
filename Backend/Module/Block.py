@@ -67,6 +67,46 @@ def remove_windows_firewall_rule(ip):
     except subprocess.CalledProcessError as e:
         print(f"Error unblocking IP {ip}: {e}")
 
+def add_tc_rule(ip, max_mb_per_sec, interface="eth0"):
+    """Limit traffic to and from an IP using tc on Linux."""
+    rate = f"{max_mb_per_sec}mbit"
+    try:
+        # Ensure an ingress qdisc exists. This may fail if it already exists.
+        subprocess.run(['sudo', 'tc', 'qdisc', 'add', 'dev', interface,
+                        'handle', 'ffff:', 'ingress'], check=False)
+        # Limit incoming traffic from the IP
+        subprocess.run([
+            'sudo', 'tc', 'filter', 'add', 'dev', interface, 'parent', 'ffff:',
+            'protocol', 'ip', 'u32', 'match', 'ip', 'src', ip, 'police',
+            'rate', rate, 'burst', '10k', 'drop', 'flowid', ':1'
+        ], check=True)
+        # Limit outgoing traffic to the IP
+        subprocess.run([
+            'sudo', 'tc', 'filter', 'add', 'dev', interface, 'parent', 'ffff:',
+            'protocol', 'ip', 'u32', 'match', 'ip', 'dst', ip, 'police',
+            'rate', rate, 'burst', '10k', 'drop', 'flowid', ':1'
+        ], check=True)
+        print(f"Traffic shaping applied for {ip} on {interface} at {rate}.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error applying tc rule for {ip}: {e}")
+
+def remove_tc_rule(ip, interface="eth0"):
+    """Remove traffic shaping rules for an IP."""
+    try:
+        subprocess.run([
+            'sudo', 'tc', 'filter', 'del', 'dev', interface, 'parent', 'ffff:',
+            'protocol', 'ip', 'u32', 'match', 'ip', 'src', ip,
+            'flowid', ':1'
+        ], check=False)
+        subprocess.run([
+            'sudo', 'tc', 'filter', 'del', 'dev', interface, 'parent', 'ffff:',
+            'protocol', 'ip', 'u32', 'match', 'ip', 'dst', ip,
+            'flowid', ':1'
+        ], check=False)
+        print(f"Traffic shaping removed for {ip} on {interface}.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error removing tc rule for {ip}: {e}")
+
 def temp_block(ip, duration_minutes, reason=None):
     if is_ip_excluded(ip):
         return
@@ -116,8 +156,15 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
         "max_mb_per_sec": max_mb_per_sec,
         "reason": reason
     }
+    if platform.system() == "Linux":
+        add_tc_rule(ip, max_mb_per_sec)
     log_measure(measure)
     update_active_measures(measure)
     print(f"Traffic slowdown set for IP {ip} with limit {max_mb_per_sec} MB/s.")
+
+def remove_traffic_slowdown(ip):
+    """Remove traffic shaping rules for a given IP."""
+    if platform.system() == "Linux":
+        remove_tc_rule(ip)
 
 initialize_json_files()
