@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Environment Variables
+
+Create a `.env` file in the `dashboard` directory based on `.env.example`.
+The following variables are required:
+
+- `ADMIN_USERNAME` – username for the admin account
+- `ADMIN_PASSWORD` – password for the admin account
+- `NEXTAUTH_SECRET` – secret used to sign authentication tokens
+- `NEXTAUTH_URL` – URL of the Next.js application (default `http://localhost:3000`)
+
