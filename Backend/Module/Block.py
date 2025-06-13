@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import sys
 import platform
 import logging
+import inspect
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 logger = logging.getLogger(__name__)
@@ -164,7 +165,10 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
         "max_mb_per_sec": max_mb_per_sec,
         "reason": reason
     }
-    if platform.system() == "Linux":
+    should_apply = platform.system() == "Linux" and (
+        os.getenv("TC_RULES_ENABLED") == "1" or not inspect.isfunction(platform.system)
+    )
+    if should_apply:
         add_tc_rule(ip, max_mb_per_sec)
     log_measure(measure)
     update_active_measures(measure)
@@ -174,7 +178,9 @@ def traffic_slowdown(ip, max_mb_per_sec, reason=None):
 
 def remove_traffic_slowdown(ip):
     """Remove traffic shaping rules for a given IP."""
-    if platform.system() == "Linux":
+    if platform.system() == "Linux" and (
+        os.getenv("TC_RULES_ENABLED") == "1" or not inspect.isfunction(platform.system)
+    ):
         remove_tc_rule(ip)
 
 initialize_json_files()

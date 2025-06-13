@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-// In-Memory storage for 2FA secrets
-const userSecrets = {};
+import { getSecret } from "../../../utils/secretStore";
 
 export default NextAuth({
   providers: [
@@ -40,7 +38,7 @@ export default NextAuth({
     },
     async session({ session, token }) {
       session.user.id = token.id;
-      session.user.secret = userSecrets[token.id] || null;
+      session.user.secret = getSecret(token.id) || null;
       return session;
     },
   },
